@@ -1,14 +1,13 @@
 'use client'
 
 import { tokenAtom, userAtom } from '~/app/atoms/session'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtom } from 'jotai'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import RecipeList from '~/app/dashboard/_components/RecipeList'
 
 export default function Dashboard() {
-    const user = useAtomValue(userAtom)!
-    const setUser = useSetAtom(userAtom)
+    const [user, setUser] = useAtom(userAtom)
     const [token, setToken] = useAtom(tokenAtom)
     const router = useRouter()
 
@@ -22,23 +21,13 @@ export default function Dashboard() {
         if (tokenCheck || userCheck) {
             setToken(undefined)
             setUser(undefined)
-            router.replace('/login')
+            router.push('/login')
         }
     }, [router, setToken, setUser, token, user])
 
     return (
-        <div className='flex h-screen items-center justify-center'>
-            <p>Hello {user && `${user.firstName} ${user.lastName}`} </p>
-        </div>
-    )
-}
-
-const AddButton = () => {
-    return (
-        <div>
-            <Link className='btn btn-primary' href='/dashboard/add'>
-                + add new
-            </Link>
+        <div className='p-4'>
+            <RecipeList />
         </div>
     )
 }

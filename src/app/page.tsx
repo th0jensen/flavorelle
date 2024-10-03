@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { userAtom } from '~/app/atoms/session'
 import { useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
+import { Riple } from 'react-loading-indicators'
 
 export default function Home() {
     const user = useAtomValue(userAtom)
@@ -11,16 +12,16 @@ export default function Home() {
 
     useEffect(() => {
         if (!user) {
-            router.replace('/login')
+            router.push('/login')
         }
         if (user) {
-            router.replace('/dashboard')
+            router.push('/dashboard')
         }
     })
 
     return (
-        <div className='flex min-h-screen flex-col items-center justify-center'>
-            <p>Loading...</p>
+        <div className='flex h-full w-full items-center justify-center'>
+            <Riple color='white' size='medium' />
         </div>
     )
 }
