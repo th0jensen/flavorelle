@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import type { Prisma } from '@prisma/client'
+import { api } from '~/trpc/react'
+import { Delete02Icon } from 'hugeicons-react'
 
 type Recipe = Prisma.RecipeGetPayload<{
     include: {
@@ -9,9 +11,21 @@ type Recipe = Prisma.RecipeGetPayload<{
 }>
 
 export default function RecipeListItem({ recipe }: { recipe: Recipe }) {
+    const recipeDeletion = api.recipe.delete.useMutation()
+
+    const handleDeletion = () => {
+        recipeDeletion.mutate({ id: recipe.id })
+    }
+
     return (
         <Link href={`/dashboard/recipe/${recipe.id}`}>
-            <div className='card relative flex h-48 w-96 justify-end overflow-hidden bg-base-300 p-4 shadow-2xl'>
+            <div className='group card relative flex h-48 w-96 justify-end overflow-hidden bg-base-300 p-4 shadow-2xl'>
+                <button
+                    className='btn input-bordered absolute right-2 top-2 z-20 hidden bg-gray-800 hover:btn-error group-hover:block'
+                    onClick={handleDeletion}
+                >
+                    <Delete02Icon />
+                </button>
                 <img
                     src={recipe.imageURL || '/path/to/placeholder-image.png'}
                     alt={`Image of ${recipe.title}`}
@@ -40,22 +54,5 @@ export default function RecipeListItem({ recipe }: { recipe: Recipe }) {
                 </div>
             </div>
         </Link>
-    )
-}
-
-export function RecipeListItemPlaceholder() {
-    return (
-        <div className='card relative flex h-48 w-96 animate-pulse justify-end overflow-hidden bg-base-300 p-4'>
-            <div className='absolute inset-0 z-0 bg-gray-300' />{' '}
-            <div className='absolute inset-0 z-10 bg-gradient-to-t from-gray-700 to-transparent' />
-            <div className='relative z-20 flex h-full flex-col justify-end text-gray-300'>
-                <div className='mb-1 h-6 w-3/4 rounded bg-gray-300' />{' '}
-                <div className='h-4 w-full rounded bg-gray-300' />{' '}
-                <div className='flex gap-2 pt-2'>
-                    <div className='h-5 w-20 rounded bg-gray-300' />{' '}
-                    <div className='h-5 w-20 rounded bg-gray-300' />{' '}
-                </div>
-            </div>
-        </div>
     )
 }

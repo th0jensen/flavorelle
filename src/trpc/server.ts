@@ -7,6 +7,7 @@ import { cache } from 'react'
 import { createCaller, type AppRouter } from '~/server/api/root'
 import { createTRPCContext } from '~/server/api/trpc'
 import { createQueryClient } from './query-client'
+import type { QueryClient } from '@tanstack/react-query'
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
@@ -21,7 +22,7 @@ const createContext = cache(() => {
     })
 })
 
-const getQueryClient = cache(createQueryClient)
+const getQueryClient: () => QueryClient = cache(createQueryClient)
 const caller = createCaller(createContext)
 
 export const { trpc: api, HydrateClient } = createHydrationHelpers<AppRouter>(

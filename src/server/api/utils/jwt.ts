@@ -1,6 +1,6 @@
 import jwt, { type JwtPayload } from 'jsonwebtoken'
 
-const SECRET = process.env.SESSION_SECRET ?? 'your-secret-key'
+const SECRET: string = process.env.SESSION_SECRET ?? 'your-secret-key'
 
 export const signJwt = (userId: string): string => {
     return jwt.sign({ userId }, SECRET)

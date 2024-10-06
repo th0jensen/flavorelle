@@ -8,10 +8,10 @@ export const recipeSchema = z.object({
     steps: z.string(),
     ingredients: z.array(
         z.object({
-            id: z.number().optional(),
             name: z.string(),
             store: z.string().nullable(),
             price: z.string(),
+            currency: z.string(),
             link: z.string().nullable(),
         }),
     ),
@@ -28,14 +28,19 @@ export const recipeRouter = createTRPCRouter({
     create: publicProcedure
         .input(recipeSchema)
         .mutation(async ({ ctx, input }) => {
-            const newRecipe = await ctx.db.recipe.create({
+            return ctx.db.recipe.create({
                 data: {
                     title: input.title,
                     description: input.description,
                     imageURL: input.imageURL,
                     steps: input.steps,
                     ingredients: {
-                        create: input.ingredients,
+                        connectOrCreate: input.ingredients.map(
+                            (ingredient) => ({
+                                where: { name: ingredient.name },
+                                create: ingredient,
+                            }),
+                        ),
                     },
                     tags: {
                         connectOrCreate: input.tags.map((tag) => ({
@@ -45,7 +50,6 @@ export const recipeRouter = createTRPCRouter({
                     },
                 },
             })
-            return newRecipe
         }),
 
     getAll: publicProcedure.query(async ({ ctx }) => {
@@ -77,16 +81,21 @@ export const recipeRouter = createTRPCRouter({
             }),
         )
         .mutation(async ({ ctx, input }) => {
-            const updatedRecipe = await ctx.db.recipe.update({
+            return ctx.db.recipe.update({
                 where: { id: input.id },
                 data: {
                     ...input.data,
                     ingredients: {
-                        set: [], // Reset ingredients
-                        create: input.data.ingredients,
+                        set: [],
+                        connectOrCreate: input.data.ingredients.map(
+                            (ingredient) => ({
+                                where: { name: ingredient.name },
+                                create: ingredient,
+                            }),
+                        ),
                     },
                     tags: {
-                        set: [], // Reset tags
+                        set: [],
                         connectOrCreate: input.data.tags.map((tag) => ({
                             where: { name: tag.name },
                             create: tag,
@@ -94,7 +103,6 @@ export const recipeRouter = createTRPCRouter({
                     },
                 },
             })
-            return updatedRecipe
         }),
 
     delete: publicProcedure
@@ -102,6 +110,30 @@ export const recipeRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             return ctx.db.recipe.delete({
                 where: { id: input.id },
+            })
+        }),
+
+    searchIngredients: publicProcedure
+        .input(z.string())
+        .query(async ({ ctx, input }) => {
+            return ctx.db.ingredient.findMany({
+                where: {
+                    name: {
+                        contains: input,
+                    },
+                },
+            })
+        }),
+
+    searchTags: publicProcedure
+        .input(z.string())
+        .query(async ({ ctx, input }) => {
+            return ctx.db.tag.findMany({
+                where: {
+                    name: {
+                        contains: input,
+                    },
+                },
             })
         }),
 })

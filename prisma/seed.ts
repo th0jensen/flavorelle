@@ -38,6 +38,7 @@ async function main() {
             name: 'Tomato',
             store: 'Grocery Store A',
             price: '1.99',
+            currency: 'USD',
             link: 'https://example.com/tomato',
         },
     })
@@ -47,6 +48,7 @@ async function main() {
             name: 'Pasta',
             store: 'Grocery Store B',
             price: '3.99',
+            currency: 'USD',
             link: 'https://example.com/pasta',
         },
     })

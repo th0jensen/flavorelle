@@ -19,9 +19,9 @@ export default function RootLayout({
         <html lang='en' className={`${GeistSans.variable}`}>
             <body>
                 <TRPCReactProvider>
-                    <main className='h-screen items-center justify-center overflow-hidden'>
+                    <main className='h-screen items-center justify-center'>
                         <Header />
-                        {children}
+                        <div className='pt-16'>{children}</div>
                     </main>
                 </TRPCReactProvider>
             </body>

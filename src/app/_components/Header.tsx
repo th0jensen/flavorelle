@@ -5,6 +5,7 @@ import { useAtom, useSetAtom } from 'jotai/index'
 import { displayMenuAtom } from '~/app/atoms/header'
 import { useRouter } from 'next/navigation'
 import { Logout03Icon, Settings01Icon, UserIcon } from 'hugeicons-react'
+import { useEffect } from 'react'
 
 export default function Header() {
     const [displayMenu, setDisplayMenu] = useAtom(displayMenuAtom)
@@ -24,15 +25,48 @@ export default function Header() {
         router.replace('/settings')
     }
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (displayMenu) {
+                const menu = document.querySelector('.menu')
+                const profileButton = document.querySelector('.btn-primary')
+                if (
+                    menu &&
+                    !menu.contains(event.target as Node) &&
+                    !profileButton?.contains(event.target as Node)
+                ) {
+                    setDisplayMenu(false)
+                }
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [displayMenu, setDisplayMenu])
+
     return (
-        <header className='navbar fixed top-0 z-20 flex h-12 w-screen bg-base-300'>
+        <header className='navbar fixed top-0 z-50 flex h-12 w-screen bg-base-300'>
             <div className='navbar-start'>
                 <h1 className='px-4 text-xl font-medium'>Flavorelle</h1>
             </div>
             <div className='fixed right-4'>
-                <ProfilePicture user={user!} />
+                <button
+                    className='btn btn-primary h-6 w-12 rounded-full'
+                    onClick={() => setDisplayMenu(!displayMenu)}
+                >
+                    <p className='text-xl'>
+                        {user ? (
+                            `${user.firstName[0]!.toUpperCase() + user.lastName[0]!.toUpperCase()}`
+                        ) : (
+                            <UserIcon />
+                        )}
+                    </p>
+                </button>
                 {displayMenu && user && (
-                    <div className='menu fixed right-4 top-20 z-50 flex w-48 flex-col items-center rounded-2xl bg-base-300 p-4 shadow-lg'>
+                    <div className='menu fixed right-2 top-[4.5rem] z-50 flex w-48 flex-col items-center rounded-2xl bg-gray-800 p-4 shadow-lg'>
                         <p className='mb-4 text-center text-lg font-semibold'>
                             {user.firstName} {user.lastName}
                         </p>
@@ -56,24 +90,5 @@ export default function Header() {
                 )}
             </div>
         </header>
-    )
-}
-
-function ProfilePicture({ user }: { user: User }) {
-    const [displayMenu, setDisplayMenu] = useAtom(displayMenuAtom)
-
-    return (
-        <button
-            className='btn btn-primary h-6 w-12 rounded-full'
-            onClick={() => setDisplayMenu(!displayMenu)}
-        >
-            <p className='text-xl'>
-                {user ? (
-                    `${user.firstName[0]!.toUpperCase() + user.lastName[0]!.toUpperCase()}`
-                ) : (
-                    <UserIcon />
-                )}
-            </p>
-        </button>
     )
 }

@@ -34,9 +34,10 @@ model Recipe {
 
 model Ingredient {
     id          Int      @id @default(autoincrement())
-    name        String
+    name        String   @unique
     store       String?
     price       String
+    currency    String
     link        String?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
