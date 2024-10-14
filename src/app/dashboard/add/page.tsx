@@ -4,54 +4,30 @@ import { type ChangeEvent, type FormEvent } from 'react'
 import { useState, useEffect } from 'react'
 import { api } from '~/trpc/react'
 import { FloppyDiskIcon } from 'hugeicons-react'
-import type { Ingredient, Prisma, Tag } from '@prisma/client'
+import type { Ingredient, Tag } from '@prisma/client'
+import Image from 'next/image'
+import CreateTag from '~/app/dashboard/add/_components/CreateTagForm'
+import CreateIngredient from '~/app/dashboard/add/_components/CreateIngredientForm'
 
 export default function AddView() {
+    const recipeMutation = api.recipe.create.useMutation()
+    const { data: allIngredients } = api.recipe.getAllIngredients.useQuery()
+    const { data: allTags } = api.recipe.getAllTags.useQuery()
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
-    const [image, setImage] = useState('')
-    const [ingredients, setIngredients] = useState<Ingredient[]>([])
-    const [tags, setTags] = useState<Tag[]>([])
+    const [image, setImage] = useState<string>('')
     const [steps, setSteps] = useState<string[]>([''])
-    const recipeMutation = api.recipe.create.useMutation()
-    const [ingredientSearch, setIngredientSearch] = useState('')
-    const [tagSearch, setTagSearch] = useState('')
-    const [ingredientResults, setIngredientResults] = useState<Ingredient[]>([])
+    const [tags, setTags] = useState<Tag[]>([])
+    const [ingredients, setIngredients] = useState<Ingredient[]>([])
+    // Search
     const [tagResults, setTagResults] = useState<Tag[]>([])
-
-    const searchIngredients = api.recipe.searchIngredients.useQuery(
-        ingredientSearch,
-        {
-            enabled: ingredientSearch.length > 0,
-        },
-    )
-
-    const searchTags = api.recipe.searchTags.useQuery(tagSearch, {
-        enabled: tagSearch.length > 0,
-    })
-
-    useEffect((): void => {
-        if (ingredientSearch.length === 0 || !searchIngredients.data) {
-            setIngredientResults([])
-        } else if (ingredientSearch.length > 0) {
-            setIngredientResults(
-                searchIngredients.data.filter(
-                    (ingredient) =>
-                        !ingredients.some((ing) => ing.id === ingredient.id),
-                ),
-            )
-        }
-
-        if (tagSearch.length === 0 || !searchTags.data) {
-            setTagResults([])
-        } else if (tagSearch.length > 0) {
-            setTagResults(
-                searchTags.data.filter(
-                    (tag) => !tags.some((t) => t.id === tag.id),
-                ),
-            )
-        }
-    }, [ingredientSearch, searchIngredients.data, searchTags.data, tagSearch])
+    const [ingredientResults, setIngredientResults] = useState<Ingredient[]>([])
+    const [tagSearch, setTagSearch] = useState('')
+    const [ingredientSearch, setIngredientSearch] = useState('')
+    // Display creation forms
+    const [showCreateTagForm, setShowCreateTagForm] = useState(false)
+    const [showCreateIngredientForm, setShowCreateIngredientForm] =
+        useState(false)
 
     const handleStepChange = (index: number, value: string): void => {
         const updatedSteps: string[] = [...steps]
@@ -81,28 +57,77 @@ export default function AddView() {
         })
     }
 
-    const handleAddNewIngredient = (ingredient: Ingredient): void => {
-        setIngredients([...ingredients, ingredient])
-        setIngredientSearch('')
-    }
-
     const handleAddNewTag = (tag: Tag): void => {
         setTags([...tags, tag])
         setTagSearch('')
+        setShowCreateTagForm(false)
     }
+
+    const handleAddNewIngredient = (ingredient: Ingredient): void => {
+        setIngredients([...ingredients, ingredient])
+        setIngredientSearch('')
+        setShowCreateIngredientForm(false)
+    }
+
+    useEffect((): void => {
+        if (!allIngredients || !allTags) {
+            setIngredientResults([])
+            setTagResults([])
+            return
+        }
+
+        setIngredientResults(
+            allIngredients.filter((ingredient: Ingredient): boolean =>
+                ingredient.name
+                    .toLowerCase()
+                    .includes(ingredientSearch.toLowerCase()),
+            ),
+        )
+
+        setTagResults(
+            allTags.filter((tag: Tag): boolean =>
+                tag.name.toLowerCase().includes(tagSearch.toLowerCase()),
+            ),
+        )
+    }, [allIngredients, allTags, ingredientSearch, tagSearch])
 
     return (
         <div className='h-full w-full pb-48'>
+            {showCreateTagForm && (
+                <CreateTag
+                    handleAddNewTag={handleAddNewTag}
+                    isOpen={setShowCreateTagForm}
+                    searchValue={tagSearch}
+                />
+            )}
+            {showCreateIngredientForm && (
+                <CreateIngredient
+                    handleAddNewIngredient={handleAddNewIngredient}
+                    isOpen={setShowCreateIngredientForm}
+                    searchValue={ingredientSearch}
+                />
+            )}
             <form onSubmit={handleSubmit}>
                 {image && (
-                    <img
+                    <Image
                         src={image || '/path/to/placeholder.img'}
+                        alt={`Image of ${title}`}
                         className='absolute inset-0 top-16 z-0 h-[50vh] w-screen rounded object-cover md:pl-16'
+                        fill
                     />
                 )}
                 <div className='absolute inset-0 top-16 z-10 h-[50vh] bg-gradient-to-t from-base-100 to-transparent' />
                 <div className='relative z-20 flex h-[50vh] flex-col justify-end p-4'>
                     <div className='flex w-full flex-col items-center justify-center gap-2 text-white'>
+                        {/*<input*/}
+                        {/*    className='input input-bordered px-0 text-center'*/}
+                        {/*    placeholder='Upload image'*/}
+                        {/*    name='image'*/}
+                        {/*    type='file'*/}
+                        {/*    onChange={(e): void => setImage(e.target.files![0])}*/}
+                        {/*    value={title}*/}
+                        {/*    required*/}
+                        {/*/>*/}
                         <input
                             style={{
                                 width: `${title.length + 15}ch`,
@@ -140,9 +165,9 @@ export default function AddView() {
                 <div className='relative'>
                     <div className='flex justify-evenly p-4 pt-1'>
                         <div className='flex flex-wrap gap-2'>
-                            {tags.map((tag: Tag) => (
+                            {tags.map((tag: Tag, index) => (
                                 <div
-                                    key={tag.id}
+                                    key={index}
                                     className='rounded-xl bg-base-300 p-2'
                                 >
                                     <p className='text-xs'>{tag.name}</p>
@@ -166,7 +191,7 @@ export default function AddView() {
                                         tagResults.map((tag: Tag) => (
                                             <div
                                                 key={tag.id}
-                                                className='cursor-pointer p-2 hover:bg-base-200'
+                                                className='w-full cursor-pointer p-2 hover:bg-base-200'
                                                 onClick={() =>
                                                     handleAddNewTag(tag)
                                                 }
@@ -176,10 +201,10 @@ export default function AddView() {
                                         ))
                                     ) : (
                                         <button
-                                            className='cursor-pointer p-2 hover:bg-base-200'
-                                            // onClick={() =>
-                                            //     handleAddNewTag(tagSearch)
-                                            // }
+                                            className='w-full cursor-pointer p-2 hover:bg-base-200'
+                                            onClick={() =>
+                                                setShowCreateTagForm(true)
+                                            }
                                         >
                                             Add new tag
                                         </button>
@@ -245,8 +270,8 @@ export default function AddView() {
                         <div>
                             <div className='flex flex-col justify-start md:items-end'>
                                 <h1 className='text-xl'>Ingredients</h1>
-                                {ingredients.map((ing: Ingredient) => (
-                                    <p className='text-sm' key={ing.id}>
+                                {ingredients.map((ing: Ingredient, index) => (
+                                    <p className='text-sm' key={index}>
                                         {ing.name}
                                     </p>
                                 ))}
@@ -269,22 +294,27 @@ export default function AddView() {
                                                 (ingredient) => (
                                                     <div
                                                         key={ingredient.id}
-                                                        className='cursor-pointer p-2 hover:bg-base-200'
+                                                        className='w-full cursor-pointer p-2 hover:bg-base-200'
                                                         onClick={() =>
                                                             handleAddNewIngredient(
                                                                 ingredient,
                                                             )
                                                         }
                                                     >
-                                                        {ingredient.name} -{' '}
+                                                        {ingredient.name}
+                                                        {' - '}
                                                         {ingredient.price}
                                                     </div>
                                                 ),
                                             )
                                         ) : (
                                             <button
-                                                className='cursor-pointer p-2 hover:bg-base-200'
-                                                // onClick={() => handleAddNewIngredient(ingredientSearch)}
+                                                className='w-full cursor-pointer p-2 hover:bg-base-200'
+                                                onClick={() =>
+                                                    setShowCreateIngredientForm(
+                                                        true,
+                                                    )
+                                                }
                                             >
                                                 Add new ingredient
                                             </button>
@@ -305,35 +335,6 @@ export default function AddView() {
                     </div>
                 </div>
             </form>
-        </div>
-    )
-}
-
-type InputProps = {
-    label: string
-    name: string
-    type: string
-    onChange: (value: string) => void
-    value: string
-}
-
-const Input = (props: InputProps): JSX.Element => {
-    const { label, name, type, onChange, value } = props
-    return (
-        <div className='flex flex-col'>
-            <label className='label label-text' htmlFor={name}>
-                {label}
-            </label>
-            <input
-                className='input input-bordered'
-                name={name}
-                type={type}
-                onChange={(e: ChangeEvent<HTMLInputElement>): void =>
-                    onChange(e.target.value)
-                }
-                value={value}
-                required
-            />
         </div>
     )
 }

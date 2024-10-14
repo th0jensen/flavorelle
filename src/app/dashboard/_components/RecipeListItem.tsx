@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Prisma } from '@prisma/client'
 import { api } from '~/trpc/react'
 import { Delete02Icon } from 'hugeicons-react'
+import Image from 'next/image'
 
 type Recipe = Prisma.RecipeGetPayload<{
     include: {
@@ -26,10 +27,11 @@ export default function RecipeListItem({ recipe }: { recipe: Recipe }) {
                 >
                     <Delete02Icon />
                 </button>
-                <img
+                <Image
                     src={recipe.imageURL || '/path/to/placeholder-image.png'}
                     alt={`Image of ${recipe.title}`}
                     className='absolute inset-0 z-0 object-cover transition-transform duration-300 ease-in-out'
+                    fill
                 />
                 <div className='absolute inset-0 z-10 bg-gradient-to-t from-gray-800 to-transparent' />
                 <div className='relative z-10 flex h-full flex-col justify-end text-white'>

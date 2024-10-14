@@ -24,15 +24,41 @@ export const recipeSchema = z.object({
     ),
 })
 
+const ingredientSchema = z.object({
+    name: z.string().min(1),
+    store: z.string().nullable(),
+    price: z.string().min(1),
+    currency: z.string().min(1),
+    link: z.string().nullable(),
+})
+
+const tagSchema = z.object({
+    id: z.number().optional(),
+    name: z.string(),
+    color: z.string(),
+})
+
 export const recipeRouter = createTRPCRouter({
     create: publicProcedure
         .input(recipeSchema)
         .mutation(async ({ ctx, input }) => {
+            let imagePath = ''
+
+            // if (input.imageFile) {
+            // const { createReadStream, filename } = await input.imageFile
+            //     const stream = createReadStream()
+            //     const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+            //     const filePath = path.join(uploadDir, filename)
+            //
+            //     await writeFile(filePath, stream)
+            // imagePath = `/uploads/${filename}`
+            // }
+
             return ctx.db.recipe.create({
                 data: {
                     title: input.title,
                     description: input.description,
-                    imageURL: input.imageURL,
+                    imageURL: imagePath,
                     steps: input.steps,
                     ingredients: {
                         connectOrCreate: input.ingredients.map(
@@ -112,6 +138,40 @@ export const recipeRouter = createTRPCRouter({
                 where: { id: input.id },
             })
         }),
+
+    createIngredient: publicProcedure
+        .input(ingredientSchema)
+        .mutation(async ({ ctx, input }) => {
+            const ingredient = await ctx.db.ingredient.create({
+                data: {
+                    ...input,
+                },
+            })
+            return {
+                ...ingredient,
+            }
+        }),
+
+    createTag: publicProcedure
+        .input(tagSchema)
+        .mutation(async ({ ctx, input }) => {
+            const tag = await ctx.db.tag.create({
+                data: {
+                    ...input,
+                },
+            })
+            return {
+                ...tag,
+            }
+        }),
+
+    getAllIngredients: publicProcedure.query(async ({ ctx }) => {
+        return ctx.db.ingredient.findMany({})
+    }),
+
+    getAllTags: publicProcedure.query(async ({ ctx }) => {
+        return ctx.db.tag.findMany({})
+    }),
 
     searchIngredients: publicProcedure
         .input(z.string())

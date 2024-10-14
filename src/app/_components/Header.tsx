@@ -1,11 +1,12 @@
 'use client'
 
-import { tokenAtom, type User, userAtom } from '~/app/atoms/session'
+import { tokenAtom, userAtom } from '~/app/atoms/session'
 import { useAtom, useSetAtom } from 'jotai/index'
 import { displayMenuAtom } from '~/app/atoms/header'
 import { useRouter } from 'next/navigation'
 import { Logout03Icon, Settings01Icon, UserIcon } from 'hugeicons-react'
 import { useEffect } from 'react'
+import Link from 'next/link'
 
 export default function Header() {
     const [displayMenu, setDisplayMenu] = useAtom(displayMenuAtom)
@@ -49,9 +50,9 @@ export default function Header() {
 
     return (
         <header className='navbar fixed top-0 z-50 flex h-12 w-screen bg-base-300'>
-            <div className='navbar-start'>
+            <Link className='navbar-start' href='/dashboard'>
                 <h1 className='px-4 text-xl font-medium'>Flavorelle</h1>
-            </div>
+            </Link>
             <div className='fixed right-4'>
                 <button
                     className='btn btn-primary h-6 w-12 rounded-full'

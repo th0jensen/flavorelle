@@ -6,7 +6,7 @@ export default function RecipeList() {
     const { data: recipes, isLoading } = api.recipe.getAll.useQuery()
 
     return (
-        <div className='flex flex-wrap gap-4'>
+        <div className='flex flex-wrap justify-center gap-4'>
             {isLoading ? (
                 <div className='flex h-screen w-screen items-center justify-center'>
                     <Riple color='white' size='medium' />

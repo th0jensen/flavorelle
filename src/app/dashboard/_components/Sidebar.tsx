@@ -7,6 +7,7 @@ import {
     WindTurbineIcon,
 } from 'hugeicons-react'
 
+// TODO: Make sidebar expanded on desktop
 export default function Sidebar() {
     return (
         <div className='sidebar sticky flex h-16 w-full items-center justify-center gap-4 overflow-hidden bg-gray-800 py-4 text-white md:h-full md:w-16 md:flex-col md:justify-start'>
