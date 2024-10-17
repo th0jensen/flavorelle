@@ -46,7 +46,7 @@ const HomeButton = () => {
 
 const RouletteButton = () => {
     return (
-        <Link href='/dashboard'>
+        <Link href='/dashboard/spin'>
             <div className='btn-ghost flex h-10 w-10 items-center justify-center rounded-full'>
                 <span className='text-2xl'>
                     <WindTurbineIcon />

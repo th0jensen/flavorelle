@@ -4,14 +4,18 @@ import { api } from '~/trpc/react'
 import { Delete02Icon } from 'hugeicons-react'
 import Image from 'next/image'
 
-type Recipe = Prisma.RecipeGetPayload<{
+export type RecipeWithNested = Prisma.RecipeGetPayload<{
     include: {
         ingredients: true
         tags: true
     }
 }>
 
-export default function RecipeListItem({ recipe }: { recipe: Recipe }) {
+export default function RecipeListItem({
+    recipe,
+}: {
+    recipe: RecipeWithNested
+}) {
     const recipeDeletion = api.recipe.delete.useMutation()
 
     const handleDeletion = () => {

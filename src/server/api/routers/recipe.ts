@@ -42,7 +42,7 @@ export const recipeRouter = createTRPCRouter({
     create: publicProcedure
         .input(recipeSchema)
         .mutation(async ({ ctx, input }) => {
-            let imagePath = ''
+            const imagePath = ''
 
             // if (input.imageFile) {
             // const { createReadStream, filename } = await input.imageFile
