@@ -25,7 +25,7 @@ const sidebarButtons: SidebarButtonProps[] = [
 
 export default function Sidebar() {
     return (
-        <div className='sidebar sticky flex h-16 w-full items-center justify-center gap-4 overflow-hidden bg-gray-800 py-4 text-white md:h-full hover:md:w-32 md:flex-col md:justify-start'>
+        <div className='sidebar sticky flex h-24 w-full items-center justify-center gap-4 overflow-hidden bg-gray-800 text-white md:h-full hover:md:w-32 md:flex-col md:justify-start py-4 pb-8'>
             {sidebarButtons.map((button, index) => (
                 <div key={index}>
                     <SidebarButton label={button.label} href={button.href} icon={button.icon} />
@@ -46,7 +46,7 @@ const SidebarButton: React.FC<SidebarButtonProps> = ({
 }) => {
     return (
         <Link href={`${href}`}>
-            <div className='btn-ghost flex h-10 w-10 md:w-28 items-center justify-center md:justify-start px-4 rounded-full gap-2'>
+            <div className='btn-ghost flex h-14 w-14 md:h-10 md:w-28 items-center justify-center md:justify-start px-4 rounded-full gap-2'>
                 <span className='text-2xl'>
                     {icon}
                 </span>
