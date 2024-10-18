@@ -42,23 +42,11 @@ export const recipeRouter = createTRPCRouter({
     create: publicProcedure
         .input(recipeSchema)
         .mutation(async ({ ctx, input }) => {
-            const imagePath = ''
-
-            // if (input.imageFile) {
-            // const { createReadStream, filename } = await input.imageFile
-            //     const stream = createReadStream()
-            //     const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-            //     const filePath = path.join(uploadDir, filename)
-            //
-            //     await writeFile(filePath, stream)
-            // imagePath = `/uploads/${filename}`
-            // }
-
             return ctx.db.recipe.create({
                 data: {
                     title: input.title,
                     description: input.description,
-                    imageURL: imagePath,
+                    imageURL: input.imageURL,
                     steps: input.steps,
                     ingredients: {
                         connectOrCreate: input.ingredients.map(

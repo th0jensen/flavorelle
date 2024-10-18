@@ -5,9 +5,11 @@ import { useState, useEffect } from 'react'
 import { api } from '~/trpc/react'
 import { FloppyDiskIcon } from 'hugeicons-react'
 import type { Ingredient, Tag } from '@prisma/client'
-import Image from 'next/image'
 import CreateTag from '~/app/dashboard/add/_components/CreateTagForm'
 import CreateIngredient from '~/app/dashboard/add/_components/CreateIngredientForm'
+import { useRouter } from 'next/navigation'
+
+const urlPattern = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
 
 export default function AddView() {
     const recipeMutation = api.recipe.create.useMutation()
@@ -28,6 +30,7 @@ export default function AddView() {
     const [showCreateTagForm, setShowCreateTagForm] = useState(false)
     const [showCreateIngredientForm, setShowCreateIngredientForm] =
         useState(false)
+    const router = useRouter()
 
     const handleStepChange = (index: number, value: string): void => {
         const updatedSteps: string[] = [...steps]
@@ -47,7 +50,7 @@ export default function AddView() {
             .filter((step: string): boolean => step.trim() !== '')
             .join('|')
 
-        await recipeMutation.mutateAsync({
+        const recipe = await recipeMutation.mutateAsync({
             title,
             description,
             imageURL: image,
@@ -55,6 +58,7 @@ export default function AddView() {
             steps: concatenatedSteps,
             tags,
         })
+        router.replace(`/dashboard/recipe/${recipe.id}`)
     }
 
     const handleAddNewTag = (tag: Tag): void => {
@@ -109,11 +113,10 @@ export default function AddView() {
             )}
             <form onSubmit={handleSubmit}>
                 {image && (
-                    <Image
-                        src={image || '/path/to/placeholder.img'}
+                    <img
+                        src={urlPattern.test(image) && image || '/path/to/placeholder.img'}
                         alt={`Image of ${title}`}
                         className='absolute inset-0 top-16 z-0 h-[50vh] w-screen rounded object-cover md:pl-16'
-                        fill
                     />
                 )}
                 <div className='absolute inset-0 top-16 z-10 h-[50vh] bg-gradient-to-t from-base-100 to-transparent' />

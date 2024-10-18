@@ -46,7 +46,7 @@ const SidebarButton: React.FC<SidebarButtonProps> = ({
 }) => {
     return (
         <Link href={`${href}`}>
-            <div className='btn-ghost flex h-10 w-10 md:w-28 items-center justify-start px-4 rounded-full gap-2'>
+            <div className='btn-ghost flex h-10 w-10 md:w-28 items-center justify-center md:justify-start px-4 rounded-full gap-2'>
                 <span className='text-2xl'>
                     {icon}
                 </span>
