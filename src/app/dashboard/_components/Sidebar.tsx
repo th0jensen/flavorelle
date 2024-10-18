@@ -7,74 +7,50 @@ import {
     WindTurbineIcon,
 } from 'hugeicons-react'
 
-// TODO: Make sidebar expanded on desktop
+const sidebarButtons: SidebarButtonProps[] = [
+    {
+        label: "Home",
+        href: "/dashboard",
+        icon: <Home03Icon />
+    }, {
+        label: "Add",
+        href: "/dashboard/add",
+        icon: <AddSquareIcon />
+    }, {
+        label: "Spin",
+        href: "/dashboard/spin",
+        icon: <WindTurbineIcon />
+    }
+]
+
 export default function Sidebar() {
     return (
-        <div className='sidebar sticky flex h-16 w-full items-center justify-center gap-4 overflow-hidden bg-gray-800 py-4 text-white md:h-full md:w-16 md:flex-col md:justify-start'>
-            <HomeButton />
-            <AddButton />
-            <RouletteButton />
-            <IngredientsButton />
-            <TagButton />
+        <div className='sidebar sticky flex h-16 w-full items-center justify-center gap-4 overflow-hidden bg-gray-800 py-4 text-white md:h-full hover:md:w-32 md:flex-col md:justify-start'>
+            {sidebarButtons.map((button, index) => (
+                <div key={index}>
+                    <SidebarButton label={button.label} href={button.href} icon={button.icon} />
+                </div>
+            ))}
         </div>
     )
 }
 
-const AddButton = () => {
-    return (
-        <Link href='/dashboard/add'>
-            <div className='btn-ghost flex h-10 w-10 items-center justify-center rounded-full'>
-                <span className='text-2xl'>
-                    <AddSquareIcon />
-                </span>
-            </div>
-        </Link>
-    )
+interface SidebarButtonProps {
+    label: string,
+    href: string,
+    icon: React.ReactNode
 }
 
-const HomeButton = () => {
+const SidebarButton: React.FC<SidebarButtonProps> = ({
+    label, href, icon
+}) => {
     return (
-        <Link href='/dashboard'>
-            <div className='btn-ghost flex h-10 w-10 items-center justify-center rounded-full'>
+        <Link href={`${href}`}>
+            <div className='btn-ghost flex h-10 w-10 md:w-28 items-center justify-start px-4 rounded-full gap-2'>
                 <span className='text-2xl'>
-                    <Home03Icon />
+                    {icon}
                 </span>
-            </div>
-        </Link>
-    )
-}
-
-const RouletteButton = () => {
-    return (
-        <Link href='/dashboard/spin'>
-            <div className='btn-ghost flex h-10 w-10 items-center justify-center rounded-full'>
-                <span className='text-2xl'>
-                    <WindTurbineIcon />
-                </span>
-            </div>
-        </Link>
-    )
-}
-
-const IngredientsButton = () => {
-    return (
-        <Link href='/dashboard'>
-            <div className='btn-ghost flex h-10 w-10 items-center justify-center rounded-full'>
-                <span className='text-2xl'>
-                    <VegetarianFoodIcon />
-                </span>
-            </div>
-        </Link>
-    )
-}
-
-const TagButton = () => {
-    return (
-        <Link href='/dashboard'>
-            <div className='btn-ghost flex h-10 w-10 items-center justify-center rounded-full'>
-                <span className='text-2xl'>
-                    <Tag02Icon />
-                </span>
+                <p className='text-sm font-light hidden md:block'>{label}</p>
             </div>
         </Link>
     )

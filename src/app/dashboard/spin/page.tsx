@@ -16,16 +16,15 @@ export default function WheelPage() {
     }
 
     useEffect(() => {
-        if (!recipes && serverRecipes) {
+        if (!recipes.length && serverRecipes) {
             setRecipes(serverRecipes)
             console.log('Server recipes: ', serverRecipes)
         }
     })
 
     return (
-        <div>
-            {serverRecipes && <Wheel recipes={serverRecipes} />}
-            <button onClick={randomizeRecipes}>Randomize</button>
+        <div className='pb-16'>
+            {recipes.length > 0 && <Wheel recipesProps={recipes} />}
         </div>
     )
 }

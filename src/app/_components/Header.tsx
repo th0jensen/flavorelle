@@ -72,7 +72,7 @@ export default function Header() {
                             {user.firstName} {user.lastName}
                         </p>
                         <button
-                            className='btn mb-2 flex w-full items-center gap-2'
+                            className='btn btn-disabled mb-2 flex w-full items-center gap-2'
                             onClick={handleSettings}
                         >
                             <Settings01Icon />

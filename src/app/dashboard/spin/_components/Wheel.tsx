@@ -10,16 +10,22 @@ const COLORS = [
 ]
 
 interface WheelProps {
-    recipes: RecipeWithNested[]
+    recipesProps: RecipeWithNested[]
 }
 
-const Wheel: React.FC<WheelProps> = ({ recipes }) => {
+const Wheel: React.FC<WheelProps> = ({ recipesProps }) => {
     const wheelRef = useRef<HTMLDivElement>(null)
     const appRef = useRef<Application | null>(null)
     const wheelContainerRef = useRef<Container | null>(null)
     const tickerRef = useRef<Graphics | null>(null)
     const [winningItem, setWinningItem] = useState<string | null>(null)
     const [isSpinning, setIsSpinning] = useState(false)
+    const [recipes, setRecipes] = useState<RecipeWithNested[]>(recipesProps)
+
+    const randomizeRecipes = () => {
+        const shuffled = [...recipes].sort(() => Math.random() - 0.5)
+        setRecipes(shuffled)
+    }
 
     const createWheel = useCallback(() => {
         if (!appRef.current || recipes.length < 2 || recipes.length > 100)
@@ -121,7 +127,7 @@ const Wheel: React.FC<WheelProps> = ({ recipes }) => {
             const slicesFromTop = Math.floor(
                 ((topPosition - normalizedRotation + Math.PI * 2) %
                     (Math.PI * 2)) /
-                    sliceAngle,
+                sliceAngle,
             )
             const winningIndex = slicesFromTop % recipes.length
 
@@ -169,13 +175,20 @@ const Wheel: React.FC<WheelProps> = ({ recipes }) => {
     return (
         <div className='flex w-full flex-col items-center justify-center'>
             <div ref={wheelRef}></div>
-            <button
-                onClick={spin}
-                disabled={isSpinning || recipes.length === 0}
-            >
-                {isSpinning ? 'Spinning...' : 'Spin'}
-            </button>
-            {winningItem && <p>Winning item: {winningItem}</p>}
+            <div className='flex gap-4'>
+                <button className='btn input-bordered'
+                    onClick={randomizeRecipes}>Randomize
+                </button>
+                <button
+                    className='btn input-bordered'
+                    onClick={spin}
+                    disabled={isSpinning || recipes?.length === 0}
+                >
+                    {isSpinning ? 'Spinning...' : 'Spin'}
+                </button>
+            </div>
+            <br />
+            {winningItem && <p className='text-xl font-bold'>Winning item: {winningItem}</p>}
         </div>
     )
 }
